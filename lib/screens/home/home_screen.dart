@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selfradio/constants.dart';
+import 'package:selfradio/screens/home/components/home_body.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   static const List<Widget> pages = <Widget>[
-    Text('Home'),
+    HomeBody(),
     Text('Music'),
     Text('List'),
   ];
@@ -47,8 +48,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   BottomNavigationBar buildBottomNavigationBar() {
     return BottomNavigationBar(
-      type: BottomNavigationBarType.shifting,
-      // Shifting
+      backgroundColor: Colors.black,
       currentIndex: selectedIndex,
       selectedIconTheme: const IconThemeData(color: kPrimaryColor, size: 33),
       unselectedItemColor: kTextColor,

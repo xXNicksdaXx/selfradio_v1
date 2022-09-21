@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selfradio/constants.dart';
+import 'package:selfradio/screens/add_song/add_song_screen.dart';
 import 'package:selfradio/screens/home/components/home_body.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
+      drawer: buildDrawer(),
       body: IndexedStack(
         index: selectedIndex,
         children: pages,
@@ -37,20 +39,56 @@ class HomeScreenState extends State<HomeScreen> {
 
   AppBar buildAppBar() {
     return AppBar(
-        title: const Text('Selfradio'),
-        backgroundColor: kPrimaryColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => {},
-        ));
+      title: const Text('Selfradio'),
+      centerTitle: true,
+      backgroundColor: kPrimaryColor,
+      elevation: 0,
+    );
+  }
+
+  Drawer buildDrawer() {
+    return Drawer(
+      backgroundColor: kBackgroundColor,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: kPrimaryColor,
+            ),
+            child: Text('Selfradio Datenverwaltung'),
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.playlist_add,
+              color: kTextColor,
+            ),
+            title: const Text('Playlist erstellen'),
+            onTap: () {
+              // Navigator.of(context).push(
+              //     MaterialPageRoute(builder: (context) => )
+              // );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.music_video, color: kTextColor),
+            title: const Text('Lied hinzufügen'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const AddSongScreen()));
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   BottomNavigationBar buildBottomNavigationBar() {
     return BottomNavigationBar(
       backgroundColor: Colors.black,
+      elevation: 4.0,
       currentIndex: selectedIndex,
-      selectedIconTheme: const IconThemeData(color: kPrimaryColor, size: 33),
+      selectedIconTheme: const IconThemeData(color: kSecondaryColor, size: 32),
       unselectedItemColor: kTextColor,
       onTap: onItemTapped,
       enableFeedback: false,

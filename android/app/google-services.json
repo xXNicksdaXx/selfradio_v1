@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "476949383674",
+    "firebase_url": "https://selfradio-f2820-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "selfradio-f2820",
+    "storage_bucket": "selfradio-f2820.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:476949383674:android:b7efc83bbc7703c3c07c43",
+        "android_client_info": {
+          "package_name": "de.nicksda.selfradio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "476949383674-smieh0jd48bp7r89fr03rav6ni1dsprn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9G9pWxHhfXnfYaRRY3z57WhxRHrRNadk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "476949383674-smieh0jd48bp7r89fr03rav6ni1dsprn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

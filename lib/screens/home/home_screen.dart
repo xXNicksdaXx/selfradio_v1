@@ -52,11 +52,13 @@ class HomeScreenState extends State<HomeScreen> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
+          UserAccountsDrawerHeader(
             decoration: BoxDecoration(
               color: kPrimaryColor,
             ),
-            child: Text('Selfradio Datenverwaltung'),
+            accountName: const Text(''),
+            accountEmail: const Text(''),
+            currentAccountPicture: Image.asset("icons/icon.png"),
           ),
           ListTile(
             leading: const Icon(
@@ -65,9 +67,8 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             title: const Text('Playlist erstellen'),
             onTap: () {
-              // Navigator.of(context).push(
-              //     MaterialPageRoute(builder: (context) => )
-              // );
+              // Navigator.of(context).push(MaterialPageRoute(
+              //     builder: (context) => const CreatePlaylistScreen()));
             },
           ),
           ListTile(
@@ -78,6 +79,14 @@ class HomeScreenState extends State<HomeScreen> {
                   builder: (context) => const AddSongScreen()));
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.settings, color: kTextColor),
+            title: const Text('Einstellungen'),
+            onTap: () {
+              // Navigator.of(context).push(MaterialPageRoute(
+              //     builder: (context) => const SettingsScreen()));
+            },
+          )
         ],
       ),
     );

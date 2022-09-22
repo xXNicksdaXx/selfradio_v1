@@ -15,7 +15,7 @@ class SearchHeader extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            height: size.height * 0.1 - 27,
+            height: size.height * 0.1,
             decoration: const BoxDecoration(
                 color: kPrimaryColor,
                 borderRadius: BorderRadius.only(

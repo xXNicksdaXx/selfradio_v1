@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selfradio/constants.dart';
-import 'package:selfradio/screens/add_song/components/song_body.dart';
+import 'package:selfradio/screens/add_song/components/upload_list.dart';
 
 class AddSongScreen extends StatelessWidget {
   const AddSongScreen({Key? key}) : super(key: key);
@@ -12,7 +12,7 @@ class AddSongScreen extends StatelessWidget {
         title: const Text('Lieder einfügen'),
         backgroundColor: kPrimaryColor,
       ),
-      body: SongBody(),
+      body: UploadList(),
     );
   }
 }

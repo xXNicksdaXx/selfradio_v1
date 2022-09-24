@@ -1,17 +1,35 @@
 import 'dart:core';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 
 class ListItem {
-  ListItem({
-    required this.expandedValue,
-    required this.headerValue,
-    required this.file,
-    this.isExpanded = false,
-  });
-
-  String expandedValue;
+  Map<String, dynamic> id3Tags;
   String headerValue;
-  PlatformFile file;
-  bool isExpanded;
+  Uint8List bytes;
+  late bool isExpanded;
+  late MetadataItem song;
+
+  ListItem({
+    required this.id3Tags,
+    required this.headerValue,
+    required this.bytes,
+  }) {
+    isExpanded = false;
+    String album = "";
+    if (id3Tags['Album'] != null) album = id3Tags['Album'];
+    song = MetadataItem(
+        artist: id3Tags['Artist'], title: id3Tags['Title'], album: album);
+  }
+}
+
+class MetadataItem {
+  String artist;
+  String title;
+  String album;
+
+  MetadataItem({
+    required this.artist,
+    required this.title,
+    required this.album,
+  });
 }

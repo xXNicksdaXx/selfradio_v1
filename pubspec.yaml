@@ -25,7 +25,8 @@ dependencies:
   get_it: ^7.2.0
   firebase_storage: ^10.3.8
   firebase_core: ^1.22.0
-  path_provider: ^2.0.11
+  id3: ^1.0.2
+  dart_tags: ^0.4.0
 
 dev_dependencies:
   flutter_test:

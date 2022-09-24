@@ -52,12 +52,11 @@ class HomeScreenState extends State<HomeScreen> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const UserAccountsDrawerHeader(
+          const DrawerHeader(
             decoration: BoxDecoration(
               color: kPrimaryColor,
             ),
-            accountName: Text(''),
-            accountEmail: Text(''),
+            child: null,
           ),
           ListTile(
             leading: const Icon(

@@ -9,7 +9,7 @@ class FirebaseStorageService {
 
   void uploadFileViaBytes(String name, Uint8List data) async {
     try {
-      await storage.ref().child(name).putData(
+      await storage.ref().child('songs/$name').putData(
           data,
           SettableMetadata(
             contentType: 'audio/mpeg',
@@ -21,13 +21,11 @@ class FirebaseStorageService {
     }
   }
 
-  void uploadFileViaPath(String name, String path) async {
-    final file = File(path);
-
+  void uploadFileViaFile(String name, File file) async {
     try {
       storage
           .ref()
-          .child(name)
+          .child('songs/$name')
           .putFile(
               file,
               SettableMetadata(

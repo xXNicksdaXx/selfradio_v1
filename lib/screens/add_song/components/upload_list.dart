@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:id3/id3.dart';
 import 'package:selfradio/constants.dart';
 import 'package:selfradio/entities/list_item.dart';
 import 'package:selfradio/screens/add_song/components/list_item_widget.dart';
@@ -25,47 +29,74 @@ class _UploadListState extends State<UploadList> {
     if (result == null) return;
 
     for (PlatformFile file in result.files) {
-      _insertItem(file);
+      final item = _createListItem(file);
+      _insertItem(item);
     }
   }
 
-  void _uploadFile(PlatformFile file) async {
+  ListItem _createListItem(PlatformFile file) {
+    Uint8List bytes;
+
     if (file.bytes != null) {
-      getIt<FirebaseStorageService>()
-          .uploadFileViaBytes(file.name, file.bytes!);
-    } else if (file.path != null) {
-      String reducedPath = file.path!.replaceFirst(
-          RegExp(r'/Android/data/de.nicksda.selfradio/files'), '');
-      getIt<FirebaseStorageService>().uploadFileViaPath(file.name, reducedPath);
+      bytes = file.bytes!;
+    } else {
+      String path = _correctPath(file.path!);
+      bytes = File(path).readAsBytesSync();
     }
+
+    MP3Instance mp3instance = MP3Instance(bytes);
+
+    ListItem item;
+
+    bool metaTagsAvailable;
+
+    try {
+      metaTagsAvailable = mp3instance.parseTagsSync();
+    } catch (exception) {
+      if (kDebugMode) {
+        print(exception);
+      }
+      metaTagsAvailable = false;
+    }
+
+    if (metaTagsAvailable) {
+      item = ListItem(
+        headerValue: file.name,
+        id3Tags: mp3instance.getMetaTags()!,
+        bytes: bytes,
+      );
+    } else {
+      final splitFileName = file.name.split(' – ');
+      item = ListItem(
+        headerValue: file.name,
+        id3Tags: {
+          'Artist': splitFileName.first,
+          'Title': splitFileName.last.substring(0, splitFileName[1].length - 4),
+          'Album': ""
+        },
+        bytes: bytes,
+      );
+    }
+    return item;
   }
 
-  void _uploadAll() async {
-    while (!emptyList) {
-      _removeItem(0);
-    }
-  }
-
-  void _insertItem(PlatformFile file) {
+  void _insertItem(ListItem newItem) {
     const newIndex = 0;
-    final newItem = ListItem(
-      headerValue: file.name,
-      expandedValue: file.path!,
-      file: file,
-    );
+
     songsToUpload.insert(newIndex, newItem);
     if (emptyList) {
       setState(() {
         emptyList = false;
       });
     }
-    listKey.currentState!.insertItem(newIndex);
+    listKey.currentState!
+        .insertItem(newIndex, duration: const Duration(milliseconds: 800));
   }
 
   void _removeItem(int index) async {
-    final uploadedItem = songsToUpload[index];
+    final ListItem uploadedItem = songsToUpload[index];
 
-    _uploadFile(uploadedItem.file);
+    _uploadFile(uploadedItem.headerValue, uploadedItem.bytes);
 
     songsToUpload.removeAt(index);
     if (songsToUpload.isEmpty) {
@@ -79,7 +110,27 @@ class _UploadListState extends State<UploadList> {
               item: uploadedItem,
               animation: animation,
               onClicked: () {},
-            ));
+            ),
+        duration: const Duration(milliseconds: 800));
+  }
+
+  void _uploadFile(String name, Uint8List bytes) async {
+    getIt<FirebaseStorageService>().uploadFileViaBytes(name, bytes);
+  }
+
+  void _uploadAll() async {
+    while (!emptyList) {
+      _removeItem(0);
+    }
+  }
+
+  String _correctPath(String oldPath) {
+    String newPath = oldPath;
+    if (Platform.isAndroid) {
+      newPath = oldPath.replaceFirst(
+          RegExp(r'/Android/data/de.nicksda.selfradio/files'), '');
+    }
+    return newPath;
   }
 
   @override

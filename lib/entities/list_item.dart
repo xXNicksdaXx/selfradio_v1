@@ -15,10 +15,23 @@ class ListItem {
     required this.bytes,
   }) {
     isExpanded = false;
-    String album = "";
-    if (id3Tags['Album'] != null) album = id3Tags['Album'];
-    song = MetadataItem(
-        artist: id3Tags['Artist'], title: id3Tags['Title'], album: album);
+    String artist, title, album;
+    if (id3Tags['Artist'] != null) {
+      artist = id3Tags['Artist'];
+    } else {
+      artist = headerValue.split(' – ').first;
+    }
+    if (id3Tags['Title'] != null) {
+      title = id3Tags['Title'];
+    } else {
+      title = headerValue.split(' – ').last;
+    }
+    if (id3Tags['Album'] != null) {
+      album = id3Tags['Album'];
+    } else {
+      album = "";
+    }
+    song = MetadataItem(artist: artist, title: title, album: album);
   }
 }
 

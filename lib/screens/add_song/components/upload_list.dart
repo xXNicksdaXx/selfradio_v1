@@ -25,7 +25,6 @@ class _UploadListState extends State<UploadList> {
   void _pickFile() async {
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(allowMultiple: true, type: FileType.audio);
-
     if (result == null) return;
 
     for (PlatformFile file in result.files) {
@@ -43,7 +42,6 @@ class _UploadListState extends State<UploadList> {
       String path = _correctPath(file.path!);
       bytes = File(path).readAsBytesSync();
     }
-
     MP3Instance mp3instance = MP3Instance(bytes);
 
     ListItem item;

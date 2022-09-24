@@ -12,11 +12,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   setup();
-  runApp(const MyApp());
+  runApp(const SelfradioApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SelfradioApp extends StatelessWidget {
+  const SelfradioApp({super.key});
 
   // This widget is the root of your application.
   @override

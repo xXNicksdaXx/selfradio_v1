@@ -88,7 +88,7 @@ class _UploadListState extends State<UploadList> {
       });
     }
     listKey.currentState!
-        .insertItem(newIndex, duration: const Duration(milliseconds: 800));
+        .insertItem(newIndex, duration: const Duration(milliseconds: 500));
   }
 
   void _removeItem(int index) async {
@@ -109,17 +109,17 @@ class _UploadListState extends State<UploadList> {
               animation: animation,
               onClicked: () {},
             ),
-        duration: const Duration(milliseconds: 800));
+        duration: const Duration(milliseconds: 500));
+  }
+
+  void _removeAll() async {
+    while (!emptyList) {
+      _removeItem(0);
+    }
   }
 
   void _uploadFile(String name, Uint8List bytes) async {
     getIt<FirebaseStorageService>().uploadFileViaBytes(name, bytes);
-  }
-
-  void _uploadAll() async {
-    while (!emptyList) {
-      _removeItem(0);
-    }
   }
 
   String _correctPath(String oldPath) {
@@ -160,7 +160,7 @@ class _UploadListState extends State<UploadList> {
         child: FloatingActionButton(
           backgroundColor: kSecondaryColor,
           onPressed: () {
-            emptyList ? _pickFile() : _uploadAll();
+            emptyList ? _pickFile() : _removeAll();
           },
           tooltip: emptyList ? 'Importiere Dateien' : 'Alles hochladen',
           child: emptyList

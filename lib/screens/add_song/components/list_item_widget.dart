@@ -33,7 +33,7 @@ class _ListItemWidgetState extends State<ListItemWidget> {
           child: ListTile(
             title: Text(widget.item.song.title),
             subtitle: Text(
-              "~ ${widget.item.song.artist}",
+              "~ ${widget.item.song.artist.join(', ')}",
               style: const TextStyle(color: Colors.white70),
             ),
             trailing: Row(

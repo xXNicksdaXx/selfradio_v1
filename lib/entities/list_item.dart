@@ -31,14 +31,15 @@ class ListItem {
     } else {
       album = "";
     }
-    song = MetadataItem(artist: artist, title: title, album: album);
+    song = MetadataItem(artist: [artist], title: title, album: album);
   }
 }
 
 class MetadataItem {
-  String artist;
+  List<String> artist;
   String title;
   String album;
+  List<String> feat = [];
 
   MetadataItem({
     required this.artist,

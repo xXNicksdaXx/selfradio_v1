@@ -17,12 +17,8 @@ class EditScreen extends StatefulWidget {
 }
 
 class _EditScreenState extends State<EditScreen> {
-  final artistKey = GlobalKey<FormBuilderState>();
-  final mixedKey = GlobalKey<FormBuilderState>();
-  final featKey = GlobalKey<FormBuilderState>();
-  List<Widget> artistFields = [];
-  List<Widget> mixedFields = [];
-  List<Widget> featFields = [];
+  final formKey = GlobalKey<FormBuilderState>();
+  List<Widget> formFields = List.empty(growable: true);
   int artists = 0;
   int feat = 0;
 
@@ -32,7 +28,7 @@ class _EditScreenState extends State<EditScreen> {
     i >= 0 ? initialValue = widget.song.artist[i] : initialValue = '';
     final form = FormBuilderTextField(
       autovalidateMode: AutovalidateMode.always,
-      initialValue: initialValue,
+      controller: TextFieldController(initialValue),
       name: 'artist$artists',
       decoration: InputDecoration(
           labelText: 'Interpret #$artists',
@@ -48,14 +44,14 @@ class _EditScreenState extends State<EditScreen> {
           errorText: 'Das Interpret-Feld darf nicht leer sein!'),
     );
     setState(() {
-      artistFields.add(form);
+      formFields.insert(form, artists - 1);
     });
   }
 
   void _createTitleForm() {
     final form = FormBuilderTextField(
       autovalidateMode: AutovalidateMode.always,
-      initialValue: widget.song.title,
+      controller: TextFieldController(widget.song.title),
       name: 'title',
       decoration: const InputDecoration(
         labelText: 'Titel',
@@ -65,14 +61,14 @@ class _EditScreenState extends State<EditScreen> {
           errorText: 'Das Titel-Feld darf nicht leer sein!'),
     );
     setState(() {
-      mixedFields.add(form);
+      formFields.add(form);
     });
   }
 
   void _createAlbumForm() {
     final form = FormBuilderTextField(
       autovalidateMode: AutovalidateMode.always,
-      initialValue: widget.song.album,
+      controller: TextFieldController(widget.song.album),
       name: 'album',
       decoration: const InputDecoration(
         labelText: 'Album',
@@ -80,7 +76,7 @@ class _EditScreenState extends State<EditScreen> {
       ),
     );
     setState(() {
-      mixedFields.add(form);
+      formFields.add(form);
     });
   }
 
@@ -88,7 +84,8 @@ class _EditScreenState extends State<EditScreen> {
     feat++;
     final form = FormBuilderTextField(
       autovalidateMode: AutovalidateMode.always,
-      name: 'feat',
+      controller: TextFieldController(),
+      name: 'feat$feat',
       decoration: InputDecoration(
         labelText: 'Feat #$feat',
         labelStyle: const TextStyle(color: kSecondaryColor),
@@ -97,7 +94,7 @@ class _EditScreenState extends State<EditScreen> {
           errorText: 'Das Titel-Feld darf nicht leer sein!'),
     );
     setState(() {
-      featFields.add(form);
+      formFields.add(form);
     });
   }
 
@@ -131,33 +128,14 @@ class _EditScreenState extends State<EditScreen> {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
-        child: Column(
-          children: [
-            FormBuilder(
-              key: artistKey,
-              autovalidateMode: AutovalidateMode.disabled,
-              child: Column(
-                children: artistFields,
+        child: FormBuilder(
+                key: artistKey,
+                autovalidateMode: AutovalidateMode.disabled,
+                child:  Column(
+                          children: formFields,
+                        ),
+                onChanged: () => artistKey.currentState!.save(),
               ),
-              onChanged: () => artistKey.currentState!.save(),
-            ),
-            FormBuilder(
-              key: mixedKey,
-              autovalidateMode: AutovalidateMode.disabled,
-              child: Column(
-                children: mixedFields,
-              ),
-              onChanged: () => mixedKey.currentState!.save(),
-            ),
-            FormBuilder(
-              key: featKey,
-              autovalidateMode: AutovalidateMode.disabled,
-              child: Column(
-                children: featFields,
-              ),
-              onChanged: () => featKey.currentState!.save(),
-            ),
-          ],
         ),
       ),
     );
@@ -173,9 +151,7 @@ class _EditScreenState extends State<EditScreen> {
         children: [
           IconButton(
               onPressed: () {
-                artistKey.currentState?.reset();
-                mixedKey.currentState?.reset();
-                featKey.currentState?.reset();
+                formKey.currentState?.reset();
                 Navigator.of(context).pop();
               },
               icon: const Icon(
@@ -185,20 +161,14 @@ class _EditScreenState extends State<EditScreen> {
           IconButton(
               onPressed: () {
                 MetadataItem? item;
-                if (artistKey.currentState!.saveAndValidate() &&
-                    mixedKey.currentState!.saveAndValidate() &&
-                    featKey.currentState!.saveAndValidate()) {
-                  Map<String, dynamic>? value = artistKey.currentState!.value;
+                if (artistKey.currentState?.saveAndValidate() ?? false) {
+                  Map<String, dynamic>? value = artistKey.currentState?.value;
                   List<String> artistList = [];
                   for (int i = 1; i <= artists; i++) {
                     artistList.add(value['artist$i']);
                   }
-                  value = artistKey.currentState!.value;
                   final title = value['title'];
-                  value = artistKey.currentState!.value;
                   final album = value['album'];
-                  print(title);
-                  print(album);
                   item = MetadataItem(
                       artist: artistList, title: title, album: album);
                   Navigator.of(context).pop(item);

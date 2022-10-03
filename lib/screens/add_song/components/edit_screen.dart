@@ -18,98 +18,56 @@ class EditScreen extends StatefulWidget {
 
 class _EditScreenState extends State<EditScreen> {
   final formKey = GlobalKey<FormBuilderState>();
-  List<Widget> formFields = List.empty(growable: true);
+  List<Widget> artistFieldList = <Widget>[];
+  List<Widget> featFieldList = <Widget>[];
+
   int artists = 0;
   int feat = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < widget.song.artist.length; i++) {
+      _createArtistForm(i);
+    }
+  }
 
   void _createArtistForm(int i) {
     artists++;
     final String initialValue;
     i >= 0 ? initialValue = widget.song.artist[i] : initialValue = '';
     final form = FormBuilderTextField(
-      autovalidateMode: AutovalidateMode.always,
-      controller: TextFieldController(initialValue),
       name: 'artist$artists',
+      autovalidateMode: AutovalidateMode.always,
+      controller: TextEditingController(text: initialValue),
       decoration: InputDecoration(
-          labelText: 'Interpret #$artists',
-          labelStyle: const TextStyle(color: kSecondaryColor),
-          suffixIcon: IconButton(
-            icon: const Icon(
-              Icons.add_circle_outline,
-              color: kPrimaryColor,
-            ),
-            onPressed: () => _createArtistForm(-1),
-          )),
+        labelText: 'Interpret #$artists',
+        labelStyle: const TextStyle(color: kSecondaryColor),
+      ),
       validator: FormBuilderValidators.required(
           errorText: 'Das Interpret-Feld darf nicht leer sein!'),
     );
     setState(() {
-      formFields.insert(form, artists - 1);
-    });
-  }
-
-  void _createTitleForm() {
-    final form = FormBuilderTextField(
-      autovalidateMode: AutovalidateMode.always,
-      controller: TextFieldController(widget.song.title),
-      name: 'title',
-      decoration: const InputDecoration(
-        labelText: 'Titel',
-        labelStyle: TextStyle(color: kSecondaryColor),
-      ),
-      validator: FormBuilderValidators.required(
-          errorText: 'Das Titel-Feld darf nicht leer sein!'),
-    );
-    setState(() {
-      formFields.add(form);
-    });
-  }
-
-  void _createAlbumForm() {
-    final form = FormBuilderTextField(
-      autovalidateMode: AutovalidateMode.always,
-      controller: TextFieldController(widget.song.album),
-      name: 'album',
-      decoration: const InputDecoration(
-        labelText: 'Album',
-        labelStyle: TextStyle(color: kSecondaryColor),
-      ),
-    );
-    setState(() {
-      formFields.add(form);
+      artistFieldList.add(form);
     });
   }
 
   void _createFeatForm() {
     feat++;
     final form = FormBuilderTextField(
-      autovalidateMode: AutovalidateMode.always,
-      controller: TextFieldController(),
       name: 'feat$feat',
+      autovalidateMode: AutovalidateMode.always,
+      controller: TextEditingController(),
       decoration: InputDecoration(
-        labelText: 'Feat #$feat',
+        labelText: 'Featuring #$feat',
         labelStyle: const TextStyle(color: kSecondaryColor),
       ),
       validator: FormBuilderValidators.required(
-          errorText: 'Das Titel-Feld darf nicht leer sein!'),
+          errorText: 'Das Feat-Feld darf nicht leer sein!'),
     );
     setState(() {
-      formFields.add(form);
+      featFieldList.add(form);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    artists = 0;
-    feat = 0;
-
-    for (int i = 0; i < widget.song.artist.length; i++) {
-      _createArtistForm(i);
-    }
-
-    _createTitleForm();
-    _createAlbumForm();
   }
 
   @override
@@ -129,15 +87,115 @@ class _EditScreenState extends State<EditScreen> {
       child: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
         child: FormBuilder(
-                key: artistKey,
-                autovalidateMode: AutovalidateMode.disabled,
-                child:  Column(
-                          children: formFields,
-                        ),
-                onChanged: () => artistKey.currentState!.save(),
+          key: formKey,
+          autovalidateMode: AutovalidateMode.disabled,
+          child: Column(
+            children: [
+              ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: artists,
+                  itemBuilder: (context, index) {
+                    return artistFieldList[index];
+                  }),
+              buildAddAndRemoveIcon(FieldClass.artistField),
+              buildDivider(),
+              FormBuilderTextField(
+                name: 'title',
+                autovalidateMode: AutovalidateMode.always,
+                controller: TextEditingController(text: widget.song.title),
+                decoration: const InputDecoration(
+                  labelText: 'Titel',
+                  labelStyle: TextStyle(color: kSecondaryColor),
+                ),
+                validator: FormBuilderValidators.required(
+                    errorText: 'Das Titel-Feld darf nicht leer sein!'),
               ),
+              buildDivider(),
+              FormBuilderTextField(
+                name: 'album',
+                autovalidateMode: AutovalidateMode.always,
+                controller: TextEditingController(text: widget.song.album),
+                decoration: const InputDecoration(
+                  labelText: 'Album',
+                  labelStyle: TextStyle(color: kSecondaryColor),
+                ),
+              ),
+              buildDivider(),
+              ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: feat,
+                  itemBuilder: (context, index) {
+                    return featFieldList[index];
+                  }),
+              buildAddAndRemoveIcon(FieldClass.featField),
+            ],
+          ),
+          onChanged: () {
+            formKey.currentState!.save();
+          },
         ),
       ),
+    );
+  }
+
+  Widget buildAddAndRemoveIcon(FieldClass fieldClass) {
+    List<Widget> icons = [];
+    if (fieldClass == FieldClass.artistField) {
+      icons.add(const Text('Interpreten bearbeiten:'));
+      icons.add(IconButton(
+          icon: const Icon(
+            Icons.add_circle_outline,
+            color: kPrimaryColor,
+          ),
+          onPressed: () {
+            _createArtistForm(-1);
+          }));
+      if (artists > 1) {
+        icons.add(
+          IconButton(
+            icon: const Icon(
+              Icons.remove_circle_outline,
+              color: kSecondaryColor,
+            ),
+            onPressed: () {
+              setState(() {
+                artistFieldList.removeLast();
+                artists--;
+              });
+            },
+          ),
+        );
+      }
+    } else {
+      icons.add(const Text('Featuring bearbeiten:'));
+      icons.add(IconButton(
+          icon: const Icon(
+            Icons.add_circle_outline,
+            color: kPrimaryColor,
+          ),
+          onPressed: () {
+            _createFeatForm();
+          }));
+      if (feat > 1) {
+        icons.add(
+          IconButton(
+            icon: const Icon(
+              Icons.remove_circle_outline,
+              color: kSecondaryColor,
+            ),
+            onPressed: () {
+              setState(() {
+                featFieldList.removeLast();
+                feat--;
+              });
+            },
+          ),
+        );
+      }
+    }
+
+    return Row(
+      children: icons,
     );
   }
 
@@ -150,36 +208,59 @@ class _EditScreenState extends State<EditScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           IconButton(
-              onPressed: () {
-                formKey.currentState?.reset();
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(
-                Icons.undo,
-                color: kTextColor,
-              )),
+            icon: const Icon(
+              Icons.undo,
+              color: kTextColor,
+            ),
+            onPressed: () {
+              formKey.currentState?.reset();
+              Navigator.of(context).pop();
+            },
+          ),
           IconButton(
-              onPressed: () {
-                MetadataItem? item;
-                if (artistKey.currentState?.saveAndValidate() ?? false) {
-                  Map<String, dynamic>? value = artistKey.currentState?.value;
-                  List<String> artistList = [];
-                  for (int i = 1; i <= artists; i++) {
-                    artistList.add(value['artist$i']);
-                  }
-                  final title = value['title'];
-                  final album = value['album'];
-                  item = MetadataItem(
-                      artist: artistList, title: title, album: album);
-                  Navigator.of(context).pop(item);
+            icon: const Icon(
+              Icons.done,
+              color: kTextColor,
+            ),
+            onPressed: () {
+              if (formKey.currentState?.saveAndValidate() ?? false) {
+                Map<String, dynamic>? values = formKey.currentState?.value;
+
+                final title = values!['title'];
+                final album = values['album'];
+
+                List<String> artistList = [];
+                for (int i = 1; i <= artists; i++) {
+                  artistList.add(values['artist$i']);
                 }
-              },
-              icon: const Icon(
-                Icons.done,
-                color: kTextColor,
-              )),
+
+                List<String>? featList = [];
+                for (int i = 1; i <= feat; i++) {
+                  featList.add(values['artist$i']);
+                }
+
+                final item = MetadataItem(
+                  artist: artistList,
+                  title: title,
+                  album: album,
+                  feat: featList,
+                );
+                Navigator.of(context).pop(item);
+              }
+            },
+          ),
         ],
       ),
     );
   }
+
+  Widget buildDivider() {
+    return const Divider(
+      height: 10,
+      thickness: 2,
+      color: kPrimaryColor,
+    );
+  }
 }
+
+enum FieldClass { artistField, featField }

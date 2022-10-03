@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selfradio/constants.dart';
 import 'package:selfradio/entities/list_item.dart';
 import 'package:selfradio/screens/add_song/components/edit_screen.dart';
+import 'package:text_scroll/text_scroll.dart';
 
 class ListItemWidget extends StatefulWidget {
   ListItemWidget(
@@ -17,7 +18,6 @@ class ListItemWidget extends StatefulWidget {
 }
 
 class _ListItemWidgetState extends State<ListItemWidget> {
-  late MetadataItem newSong;
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +31,21 @@ class _ListItemWidgetState extends State<ListItemWidget> {
             color: kAltBackgroundColor,
           ),
           child: ListTile(
-            title: Text(widget.item.song.title),
-            subtitle: Text(
-              "~ ${widget.item.song.artist.join(', ')}",
-              style: const TextStyle(color: Colors.white70),
+            title: Padding(
+                padding: const EdgeInsets.only(top: kDefaultPadding * 0.25),
+                child: TextScroll(
+                  widget.item.song.title,
+                  velocity: const Velocity(pixelsPerSecond: Offset(32, 0)),
+                  delayBefore: const Duration(milliseconds: 2000),
+                )),
+            subtitle: Padding(
+              padding: const EdgeInsets.all(kDefaultPadding * 0.25),
+              child: TextScroll(
+                "~ ${widget.item.song.artist.join(', ')}",
+                style: const TextStyle(color: Colors.white70),
+                velocity: const Velocity(pixelsPerSecond: Offset(32, 0)),
+                delayBefore: const Duration(milliseconds: 2000),
+              ),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,

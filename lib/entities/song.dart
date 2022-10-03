@@ -8,6 +8,7 @@ class Song {
   final String path;
   final bool favorite;
   final List<String> playlists;
+  final List<String>? feat;
 
   const Song({
     required this.id,
@@ -17,6 +18,7 @@ class Song {
     required this.path,
     required this.favorite,
     required this.playlists,
+    this.feat,
   });
 
   factory Song.fromJson(Map<String, dynamic> json) {
@@ -28,10 +30,12 @@ class Song {
       path: json['path'],
       favorite: json['favorite'],
       playlists: json['playlists'],
+      feat: json['feat'],
     );
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         '_id': id,
         'title': title,
         'artist': artist,
@@ -39,5 +43,6 @@ class Song {
         'path': path,
         'favorite': favorite,
         'playlists': playlists,
+        'feat': feat,
       };
 }

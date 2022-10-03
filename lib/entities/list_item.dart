@@ -39,11 +39,12 @@ class MetadataItem {
   List<String> artist;
   String title;
   String album;
-  List<String> feat = [];
+  List<String>? feat = [];
 
   MetadataItem({
     required this.artist,
     required this.title,
     required this.album,
+    this.feat,
   });
 }

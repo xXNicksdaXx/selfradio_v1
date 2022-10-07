@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:id3/id3.dart';
 import 'package:selfradio/constants.dart';
 import 'package:selfradio/entities/list_item.dart';
+import 'package:selfradio/entities/song.dart';
 import 'package:selfradio/screens/add_song/components/list_item_widget.dart';
+import 'package:selfradio/services/cloud_firestore.service.dart';
 import 'package:selfradio/services/firebase_storage.service.dart';
 import 'package:selfradio/services/locator.dart';
 
@@ -59,14 +61,14 @@ class _UploadListState extends State<UploadList> {
 
     if (metaTagsAvailable) {
       item = ListItem(
-        headerValue: file.name,
+        originalTitle: file.name,
         id3Tags: mp3instance.getMetaTags()!,
         bytes: bytes,
       );
     } else {
       final splitFileName = file.name.split(' – ');
       item = ListItem(
-        headerValue: file.name,
+        originalTitle: file.name,
         id3Tags: {
           'Artist': splitFileName.first,
           'Title': splitFileName.last.substring(0, splitFileName[1].length - 4),
@@ -92,11 +94,12 @@ class _UploadListState extends State<UploadList> {
   }
 
   void _removeItem(int index) async {
-    final ListItem uploadedItem = songsToUpload[index];
-
-    _uploadFile(uploadedItem.headerValue, uploadedItem.bytes);
-
+    final ListItem itemToUpload = songsToUpload[index];
     songsToUpload.removeAt(index);
+
+    String id = await _addToFirestore(itemToUpload.song);
+    _uploadFile('$id.mp3', itemToUpload.bytes);
+
     if (songsToUpload.isEmpty) {
       setState(() {
         emptyList = true;
@@ -105,7 +108,7 @@ class _UploadListState extends State<UploadList> {
     listKey.currentState!.removeItem(
         index,
         (context, animation) => ListItemWidget(
-              item: uploadedItem,
+              item: itemToUpload,
               animation: animation,
               onClicked: () {},
             ),
@@ -113,9 +116,14 @@ class _UploadListState extends State<UploadList> {
   }
 
   void _removeAll() async {
-    while (!emptyList) {
+    while (songsToUpload.isNotEmpty) {
       _removeItem(0);
+      await Future.delayed(const Duration(milliseconds: 750));
     }
+  }
+
+  Future<String> _addToFirestore(SongDTO dto) async {
+    return getIt<CloudFirestoreService>().addSong(dto);
   }
 
   void _uploadFile(String name, Uint8List bytes) async {

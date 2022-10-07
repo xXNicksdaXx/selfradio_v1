@@ -4,6 +4,8 @@ import 'package:selfradio/entities/list_item.dart';
 import 'package:selfradio/screens/add_song/components/edit_screen.dart';
 import 'package:text_scroll/text_scroll.dart';
 
+import '../../../entities/song.dart';
+
 class ListItemWidget extends StatefulWidget {
   ListItemWidget(
       {Key? key, required this.item, required this.animation, this.onClicked})
@@ -22,7 +24,6 @@ class _ListItemWidgetState extends State<ListItemWidget> {
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
-      key: ValueKey(widget.item.headerValue),
       sizeFactor: widget.animation,
       child: Container(
           margin: const EdgeInsets.all(kDefaultPadding * 0.5),
@@ -41,7 +42,7 @@ class _ListItemWidgetState extends State<ListItemWidget> {
             subtitle: Padding(
               padding: const EdgeInsets.all(kDefaultPadding * 0.25),
               child: TextScroll(
-                "~ ${widget.item.song.artist.join(', ')}",
+                "~ ${widget.item.song.artists.join(', ')}",
                 style: const TextStyle(color: Colors.white70),
                 velocity: const Velocity(pixelsPerSecond: Offset(32, 0)),
                 delayBefore: const Duration(milliseconds: 2000),
@@ -64,7 +65,7 @@ class _ListItemWidgetState extends State<ListItemWidget> {
                                     song: widget.item.song,
                                   )));
                       setState(() {
-                        if (result is MetadataItem) {
+                        if (result is SongDTO) {
                           widget.item.song = result;
                         }
                       });

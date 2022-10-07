@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:selfradio/entities/list_item.dart';
 
 import '../../../constants.dart';
+import '../../../entities/song.dart';
 
 class EditScreen extends StatefulWidget {
   const EditScreen({Key? key, required this.context, required this.song})
       : super(key: key);
 
   final BuildContext context;
-  final MetadataItem song;
+  final SongDTO song;
 
   @override
   State<EditScreen> createState() => _EditScreenState();
@@ -27,15 +27,20 @@ class _EditScreenState extends State<EditScreen> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < widget.song.artist.length; i++) {
+    for (int i = 0; i < widget.song.artists.length; i++) {
       _createArtistForm(i);
+    }
+    if (widget.song.feat != null) {
+      for (int i = 0; i < widget.song.feat!.length; i++) {
+        _createFeatForm(i);
+      }
     }
   }
 
   void _createArtistForm(int i) {
     artists++;
     final String initialValue;
-    i >= 0 ? initialValue = widget.song.artist[i] : initialValue = '';
+    i >= 0 ? initialValue = widget.song.artists[i] : initialValue = '';
     final form = FormBuilderTextField(
       name: 'artist$artists',
       autovalidateMode: AutovalidateMode.always,
@@ -52,12 +57,14 @@ class _EditScreenState extends State<EditScreen> {
     });
   }
 
-  void _createFeatForm() {
+  void _createFeatForm(int i) {
     feat++;
+    final String initialValue;
+    i >= 0 ? initialValue = widget.song.feat![i] : initialValue = '';
     final form = FormBuilderTextField(
       name: 'feat$feat',
       autovalidateMode: AutovalidateMode.always,
-      controller: TextEditingController(),
+      controller: TextEditingController(text: initialValue),
       decoration: InputDecoration(
         labelText: 'Featuring #$feat',
         labelStyle: const TextStyle(color: kSecondaryColor),
@@ -174,7 +181,7 @@ class _EditScreenState extends State<EditScreen> {
             color: kPrimaryColor,
           ),
           onPressed: () {
-            _createFeatForm();
+            _createFeatForm(-1);
           }));
       if (feat > 1) {
         icons.add(
@@ -236,11 +243,11 @@ class _EditScreenState extends State<EditScreen> {
 
                 List<String>? featList = [];
                 for (int i = 1; i <= feat; i++) {
-                  featList.add(values['artist$i']);
+                  featList.add(values['feat$i']);
                 }
 
-                final item = MetadataItem(
-                  artist: artistList,
+                final item = SongDTO(
+                  artists: artistList,
                   title: title,
                   album: album,
                   feat: featList,

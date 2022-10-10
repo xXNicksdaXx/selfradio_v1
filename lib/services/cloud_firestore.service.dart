@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../entities/dto/song_dto.dart';
 import '../entities/song.dart';
 
 class CloudFirestoreService {

@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:id3/id3.dart';
 
 import '../../../constants.dart';
+import '../../../entities/dto/song_dto.dart';
 import '../../../entities/list_item.dart';
-import '../../../entities/song.dart';
 import '../../../services/cloud_firestore.service.dart';
 import '../../../services/firebase_storage.service.dart';
 import '../../../services/locator.dart';

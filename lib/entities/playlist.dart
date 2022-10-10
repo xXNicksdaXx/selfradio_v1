@@ -1,36 +1,40 @@
 import 'dart:core';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'song.dart';
 
 class Playlist {
-  final String id;
-  final String name;
-  final String description;
-  final List<Song> songs;
-  final String coverPath;
+  final String? name;
+  final String? description;
+  final List<Song>? songs;
+  final String? coverPath;
 
-  const Playlist({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.songs,
-    required this.coverPath,
+  Playlist({
+    this.name,
+    this.description,
+    this.songs,
+    this.coverPath,
   });
 
-  factory Playlist.fromJson(Map<String, dynamic> json) {
+  factory Playlist.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot,
+      SnapshotOptions? options) {
+    final data = snapshot.data();
     return Playlist(
-        id: json['_id'],
-        name: json['name'],
-        description: json['description'],
-        songs: json['songs'],
-        coverPath: json['coverPath']);
+      name: data?['name'],
+      description: data?['description'],
+      songs: data?['songs'] is Iterable ? List.from(data?['songs']) : null,
+      coverPath: data?['coverPath'],
+    );
   }
 
-  Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-        'description': description,
-        'songs': songs,
-        'coverPath': coverPath,
-      };
+  Map<String, dynamic> toFirestore() {
+    return {
+      if (name != null) "name": name,
+      if (description != null) "description": description,
+      if (songs != null) "songs": songs,
+      if (coverPath != null) "coverPath": coverPath,
+    };
+  }
 }

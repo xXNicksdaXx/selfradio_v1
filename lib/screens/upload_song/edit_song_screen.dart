@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../constants.dart';
-import '../../entities/song.dart';
+import '../../entities/dto/song_dto.dart';
 
 class EditScreen extends StatefulWidget {
   const EditScreen({Key? key, required this.context, required this.song})

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../../constants.dart';
+import '../../../entities/dto/song_dto.dart';
 import '../../../entities/list_item.dart';
-import '../../../entities/song.dart';
 import '../edit_song_screen.dart';
 
 class ListItemWidget extends StatefulWidget {

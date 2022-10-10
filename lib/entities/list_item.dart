@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/foundation.dart';
 
-import 'song.dart';
+import 'dto/song_dto.dart';
 
 class ListItem {
   Map<String, dynamic> id3Tags;

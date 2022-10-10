@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-import '../../../constants.dart';
-import '../../../entities/song.dart';
+import '../../constants.dart';
+import '../../entities/song.dart';
 
 class EditScreen extends StatefulWidget {
   const EditScreen({Key? key, required this.context, required this.song})
@@ -260,14 +260,14 @@ class _EditScreenState extends State<EditScreen> {
       ),
     );
   }
+}
 
-  Widget buildDivider() {
-    return const Divider(
-      height: 10,
-      thickness: 2,
-      color: kPrimaryColor,
-    );
-  }
+Widget buildDivider() {
+  return const Divider(
+    height: 10,
+    thickness: 2,
+    color: kPrimaryColor,
+  );
 }
 
 enum FieldClass { artistField, featField }

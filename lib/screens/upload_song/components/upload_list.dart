@@ -4,13 +4,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:id3/id3.dart';
-import 'package:selfradio/constants.dart';
-import 'package:selfradio/entities/list_item.dart';
-import 'package:selfradio/entities/song.dart';
-import 'package:selfradio/screens/add_song/components/list_item_widget.dart';
-import 'package:selfradio/services/cloud_firestore.service.dart';
-import 'package:selfradio/services/firebase_storage.service.dart';
-import 'package:selfradio/services/locator.dart';
+
+import '../../../constants.dart';
+import '../../../entities/list_item.dart';
+import '../../../entities/song.dart';
+import '../../../services/cloud_firestore.service.dart';
+import '../../../services/firebase_storage.service.dart';
+import '../../../services/locator.dart';
+import 'list_item_widget.dart';
 
 class UploadList extends StatefulWidget {
   const UploadList({Key? key}) : super(key: key);
@@ -118,7 +119,7 @@ class _UploadListState extends State<UploadList> {
   void _removeAll() async {
     while (songsToUpload.isNotEmpty) {
       _removeItem(0);
-      await Future.delayed(const Duration(milliseconds: 750));
+      await Future.delayed(const Duration(milliseconds: 850));
     }
   }
 

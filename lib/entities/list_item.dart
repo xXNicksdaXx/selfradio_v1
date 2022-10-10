@@ -1,7 +1,8 @@
 import 'dart:core';
 
 import 'package:flutter/foundation.dart';
-import 'package:selfradio/entities/song.dart';
+
+import 'song.dart';
 
 class ListItem {
   Map<String, dynamic> id3Tags;

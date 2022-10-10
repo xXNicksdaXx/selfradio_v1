@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:selfradio/entities/song.dart';
+
+import '../entities/song.dart';
 
 class CloudFirestoreService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -24,5 +25,22 @@ class CloudFirestoreService {
 
     await ref.set(song);
     return ref.id;
+  }
+
+  Future<List<Song>> fetchAllSongs() async {
+    List<Song> allSongs = [];
+    final ref = firestore.collection("songs").withConverter(
+        fromFirestore: Song.fromFirestore,
+        toFirestore: (song, options) => song.toFirestore());
+
+    QuerySnapshot<Song> querySnapshot = await ref.orderBy('artists').get();
+    for (QueryDocumentSnapshot<Song> song in querySnapshot.docs) {
+      allSongs.add(song.data());
+    }
+
+    allSongs.sort((Song a, Song b) => a.artists!.first
+        .toLowerCase()
+        .compareTo(b.artists!.first.toLowerCase()));
+    return allSongs;
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:selfradio/constants.dart';
-import 'package:selfradio/screens/add_song/add_song_screen.dart';
-import 'package:selfradio/screens/home/components/home_body.dart';
+
+import '../../constants.dart';
+import '../upload_song/add_song_screen.dart';
+import 'components/home_body.dart';
+import 'components/song_list_body.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -15,7 +17,7 @@ class HomeScreenState extends State<HomeScreen> {
   static const List<Widget> pages = <Widget>[
     HomeBody(),
     Text('Music'),
-    Text('List'),
+    SongListBody(),
   ];
 
   @override

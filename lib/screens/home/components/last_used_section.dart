@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:selfradio/constants.dart';
+
+import '../../../constants.dart';
 
 class LastUsedSection extends StatelessWidget {
   const LastUsedSection({required this.size, Key? key}) : super(key: key);

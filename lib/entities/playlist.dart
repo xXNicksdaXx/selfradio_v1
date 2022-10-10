@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:selfradio/entities/song.dart';
+import 'song.dart';
 
 class Playlist {
   final String id;

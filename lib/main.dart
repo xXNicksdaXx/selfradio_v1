@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:selfradio/constants.dart';
-import 'package:selfradio/screens/home/home_screen.dart';
-import 'package:selfradio/services/locator.dart';
 
+import 'constants.dart';
 import 'firebase_options.dart';
+import 'screens/home/home_screen.dart';
+import 'services/locator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,45 +1,40 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:selfradio/services/locator.dart';
+import 'package:selfradio/services/page_manager.dart';
 
-import '../../services/audio_player_service.dart';
-import '../../services/locator.dart';
+import 'components/audio_control_buttons.dart';
+import 'components/audio_progress_bar.dart';
+import 'components/current_song_title.dart';
 
-class MusicPlayerBody extends StatelessWidget {
+class MusicPlayerBody extends StatefulWidget {
   const MusicPlayerBody({Key? key}) : super(key: key);
 
   @override
+  State<MusicPlayerBody> createState() => _MusicPlayerBodyState();
+}
+
+class _MusicPlayerBodyState extends State<MusicPlayerBody> {
+  @override
+  void initState() {
+    super.initState();
+    getIt<PageManager>().init();
+  }
+
+  @override
+  void dispose() {
+    getIt<PageManager>().dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
       child: Column(
-        children: [
-          StreamBuilder(
-            stream: getIt<AudioPlayerService>().playbackState,
-            builder: (context, snapshot) {
-              final playing = snapshot.data?.playing ?? false;
-              final processingState =
-                  snapshot.data?.processingState ?? AudioProcessingState.idle;
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (playing)
-                    ElevatedButton(
-                        child: Text("Pause"),
-                        onPressed: getIt<AudioPlayerService>().pause)
-                  else
-                    ElevatedButton(
-                        child: Text("Play"),
-                        onPressed: getIt<AudioPlayerService>().play),
-                ],
-              );
-            },
-          ),
-          ElevatedButton(
-            child: const Text("Stop"),
-            onPressed: () {
-              final audioPlayerService = getIt<AudioPlayerService>();
-              audioPlayerService.stop();
-            },
-          ),
+        children: const [
+          CurrentSongTitle(),
+          AudioProgressBar(),
+          AudioControlButtons(),
         ],
       ),
     );

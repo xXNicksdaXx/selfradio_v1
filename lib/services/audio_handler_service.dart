@@ -1,10 +1,21 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 
-class AudioPlayerService extends BaseAudioHandler with SeekHandler {
+Future<AudioHandler> initAudioService() async {
+  return await AudioService.init(
+      builder: () => AudioHandlerService(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'de.nicksda.selfradio.audio',
+        androidNotificationChannelName: 'Selfradio',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ));
+}
+
+class AudioHandlerService extends BaseAudioHandler with SeekHandler {
   AudioPlayer player = AudioPlayer();
 
-  AudioPlayerService() {
+  AudioHandlerService() {
     playbackState.add(playbackState.value.copyWith(
         controls: [MediaControl.play],
         processingState: AudioProcessingState.loading));

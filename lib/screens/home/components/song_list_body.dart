@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
 import '../../../entities/song.dart';
-import '../../../services/cloud_firestore.service.dart';
+import '../../../services/cloud_firestore_service.dart';
 import '../../../services/locator.dart';
 
 class SongListBody extends StatefulWidget {

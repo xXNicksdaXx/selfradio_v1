@@ -1,5 +1,7 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:selfradio/services/audio_player_service.dart';
 
 import 'constants.dart';
 import 'firebase_options.dart';
@@ -11,7 +13,15 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  setup();
+  await setup();
+  await AudioService.init(
+      builder: () => AudioPlayerService(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'de.nicksda.selfradio.audio',
+        androidNotificationChannelName: 'Selfradio',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ));
   runApp(const SelfradioApp());
 }
 

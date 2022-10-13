@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:selfradio/screens/music_player/music_player_body.dart';
 
 import '../../constants.dart';
 import '../upload_song/add_song_screen.dart';
@@ -16,7 +17,7 @@ class HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   static const List<Widget> pages = <Widget>[
     HomeBody(),
-    Text('Music'),
+    MusicPlayerBody(),
     SongListBody(),
   ];
 

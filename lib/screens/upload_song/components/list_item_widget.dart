@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:selfradio/entities/list_item.dart';
+import 'package:selfradio/provider/upload_list_state.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../../constants.dart';
 import '../../../entities/dto/song_dto.dart';
 import '../../../entities/enum/upload_state.dart';
-import '../../../entities/list_item.dart';
-import '../../../provider/upload_list_provider.dart';
 import '../edit_song_screen.dart';
 
-class ListItemWidget extends StatefulWidget {
+class ListItemWidget extends ConsumerWidget {
   const ListItemWidget({Key? key, required this.item, required this.onClicked})
       : super(key: key);
 
@@ -17,20 +17,7 @@ class ListItemWidget extends StatefulWidget {
   final VoidCallback? onClicked;
 
   @override
-  State<ListItemWidget> createState() => _ListItemWidgetState();
-}
-
-class _ListItemWidgetState extends State<ListItemWidget> {
-  late SongDTO song;
-
-  @override
-  void initState() {
-    super.initState();
-    song = widget.item.song;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
         margin: const EdgeInsets.all(kDefaultPadding * 0.5),
         decoration: BoxDecoration(
@@ -41,27 +28,29 @@ class _ListItemWidgetState extends State<ListItemWidget> {
           title: Padding(
               padding: const EdgeInsets.only(top: kDefaultPadding * 0.25),
               child: TextScroll(
-                song.title,
+                item.song.title,
                 velocity: const Velocity(pixelsPerSecond: Offset(32, 0)),
                 delayBefore: const Duration(milliseconds: 2000),
               )),
           subtitle: Padding(
             padding: const EdgeInsets.all(kDefaultPadding * 0.25),
             child: TextScroll(
-              "~ ${song.artists.join(', ')}",
+              "~ ${item.song.artists.join(', ')}",
               style: const TextStyle(color: Colors.white70),
               velocity: const Velocity(pixelsPerSecond: Offset(32, 0)),
               delayBefore: const Duration(milliseconds: 2000),
             ),
           ),
-          trailing: buildTrailingIcons(),
+          trailing: buildTrailingIcons(context, ref),
         ));
   }
 
-  Widget buildTrailingIcons() {
-    UploadState uploadState =
-        Provider.of<UploadListProvider>(context, listen: false)
-            .getUploadState(widget.item.index);
+  Widget buildTrailingIcons(BuildContext context, WidgetRef ref) {
+    UploadState uploadState = ref
+        .watch(uploadListState)
+        .where((element) => element.id == item.id)
+        .first
+        .uploadState;
     switch (uploadState) {
       case UploadState.notStarted:
         return Row(
@@ -78,13 +67,13 @@ class _ListItemWidgetState extends State<ListItemWidget> {
                       await Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => EditScreen(
                                 context: context,
-                                song: song,
+                                song: item.song,
                               )));
-                  setState(() {
-                    if (result is SongDTO) {
-                      song = result;
-                    }
-                  });
+                  if (result is SongDTO) {
+                    ref
+                        .watch(uploadListState.notifier)
+                        .setListItem(item.id, item.setSongDTO(result));
+                  }
                 }),
             IconButton(
               icon: const Icon(
@@ -92,7 +81,7 @@ class _ListItemWidgetState extends State<ListItemWidget> {
                 color: kTextColor,
               ),
               tooltip: 'Hochladen',
-              onPressed: widget.onClicked,
+              onPressed: onClicked,
             ),
           ],
         );
@@ -114,5 +103,9 @@ class _ListItemWidgetState extends State<ListItemWidget> {
           color: kSecondaryColor,
         );
     }
+  }
+
+  getItem(WidgetRef ref) {
+    return ref.read(uploadListState);
   }
 }

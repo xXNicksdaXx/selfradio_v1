@@ -4,50 +4,47 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:id3/id3.dart';
-import 'package:provider/provider.dart';
+import 'package:selfradio/provider/upload_list_state.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../constants.dart';
 import '../../../entities/dto/song_dto.dart';
 import '../../../entities/enum/upload_state.dart';
 import '../../../entities/list_item.dart';
-import '../../../provider/upload_list_provider.dart';
 import '../../../services/cloud_firestore_service.dart';
 import '../../../services/firebase_storage_service.dart';
 import '../../../services/locator.dart';
 import 'list_item_widget.dart';
 
-class UploadList extends StatefulWidget {
+class UploadList extends ConsumerWidget {
   const UploadList({Key? key}) : super(key: key);
 
-  @override
-  State<UploadList> createState() => _UploadListState();
-}
-
-class _UploadListState extends State<UploadList> {
-  List<ListItem> listItems = [];
+  static const uuid = Uuid();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
       children: [
-        buildList(context),
-        buildFloatingActionButton(context),
+        buildList(context, ref),
+        buildFloatingActionButton(context, ref),
       ],
     );
   }
 
-  Widget buildList(BuildContext context) {
+  Widget buildList(BuildContext context, WidgetRef ref) {
+    final songsToUpload = ref.watch(uploadListState);
     return ListView.builder(
-        itemCount: listItems.length,
-        itemBuilder: (context, index) => ListItemWidget(
-              item: listItems[index],
-              onClicked: () => _removeItem(index),
+        itemCount: songsToUpload.length,
+        itemBuilder: (_, index) => ListItemWidget(
+              item: songsToUpload[index],
+              onClicked: () => _removeItem(ref, songsToUpload[index].id),
             ));
   }
 
-  Widget buildFloatingActionButton(BuildContext context) {
-    final emptyList = listItems.isEmpty;
+  Widget buildFloatingActionButton(BuildContext context, WidgetRef ref) {
+    final emptyList = ref.watch(uploadListState).isEmpty;
 
     return Padding(
       padding: const EdgeInsets.all(kDefaultPadding),
@@ -56,7 +53,7 @@ class _UploadListState extends State<UploadList> {
         child: FloatingActionButton(
           backgroundColor: kSecondaryColor,
           onPressed: () {
-            emptyList ? _pickFile() : _removeAll();
+            emptyList ? _pickFile(ref) : _removeAll(ref);
           },
           tooltip: emptyList ? 'Importiere Dateien' : 'Alles hochladen',
           child: emptyList
@@ -67,24 +64,18 @@ class _UploadListState extends State<UploadList> {
     );
   }
 
-  void _pickFile() async {
+  void _pickFile(WidgetRef ref) async {
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(allowMultiple: true, type: FileType.audio);
     if (result == null) return;
 
-    int i = 0;
     for (PlatformFile file in result.files) {
-      setState(() {
-        listItems.add(_createListItem(file, i));
-      });
-      Provider.of<UploadListProvider>(context, listen: false).createEntry(i);
-      i++;
+      ref.read(uploadListState.notifier).addItem(_createListItem(file));
     }
   }
 
-  ListItem _createListItem(PlatformFile file, int i) {
+  ListItem _createListItem(PlatformFile file) {
     Uint8List bytes;
-
     if (file.bytes != null) {
       bytes = file.bytes!;
     } else {
@@ -99,7 +90,6 @@ class _UploadListState extends State<UploadList> {
     MP3Instance mp3instance = MP3Instance(bytes);
     ListItem item;
     bool metaTagsAvailable;
-
     try {
       metaTagsAvailable = mp3instance.parseTagsSync();
     } catch (exception) {
@@ -111,63 +101,84 @@ class _UploadListState extends State<UploadList> {
 
     if (metaTagsAvailable) {
       item = ListItem(
-        originalTitle: file.name,
-        id3Tags: mp3instance.getMetaTags()!,
-        bytes: bytes,
-          index: i);
+          id: uuid.v4(),
+          originalTitle: file.name,
+          id3Tags: mp3instance.getMetaTags()!,
+          bytes: bytes);
     } else {
       final splitFileName = file.name.split(' – ');
       item = ListItem(
-        originalTitle: file.name,
-        id3Tags: {
-          'Artist': splitFileName.first,
-          'Title': splitFileName.last.substring(0, splitFileName[1].length - 4),
-          'Album': ""
-        },
-        bytes: bytes,
-        index: i,
-      );
+          id: uuid.v4(),
+          originalTitle: file.name,
+          id3Tags: {
+            'Artist': splitFileName.first,
+            'Title':
+                splitFileName.last.substring(0, splitFileName[1].length - 4),
+            'Album': ""
+          },
+          bytes: bytes);
     }
     return item;
   }
 
-  Future<void> _removeItem(int index) async {
-    final ListItem itemToUpload = listItems[index];
+  Future<void> _removeItem(WidgetRef ref, String uuid) async {
+    final itemToUpload = ref.read(uploadListState.notifier).getItem(uuid);
+    if (itemToUpload == null) return;
 
     String id = await _addToFirestore(itemToUpload.song);
     UploadTask task = await _uploadFileToStorage('$id.mp3', itemToUpload.bytes);
-    Provider.of<UploadListProvider>(context, listen: false)
-        .updateUploadState(index, UploadState.running);
-
-    task.snapshotEvents.listen((event) async {
-      if (event.state == TaskState.success) {
-        // change icon
-        Provider.of<UploadListProvider>(context, listen: false)
-            .updateUploadState(index, UploadState.successful);
-
-        // remove item from list
-        setState(() {
-          listItems.removeAt(index);
-        });
-        return;
-      } else if (event.state == TaskState.running) {
-        UploadState uploadState =
-            Provider.of<UploadListProvider>(context, listen: false)
-                .getUploadState(index);
-        if (uploadState != UploadState.running) {
-          Provider.of<UploadListProvider>(context, listen: false)
-              .updateUploadState(index, UploadState.running);
-        }
-      } else {
-        UploadState uploadState =
-            Provider.of<UploadListProvider>(context, listen: false)
-                .getUploadState(index);
-        if (uploadState != UploadState.error) {
-          Provider.of<UploadListProvider>(context, listen: false)
-              .updateUploadState(index, UploadState.error);
-        }
+    task.snapshotEvents.listen((taskSnapshot) {
+      bool running = false;
+      switch (taskSnapshot.state) {
+        case TaskState.running:
+          if (!running) {
+            ref.read(uploadListState.notifier).setListItem(
+                uuid, itemToUpload.setUploadState(UploadState.running));
+            running = true;
+          }
+          break;
+        case TaskState.success:
+          ref.read(uploadListState.notifier).setListItem(
+              uuid, itemToUpload.setUploadState(UploadState.successful));
+          ref.read(uploadListState.notifier).removeItem(uuid);
+          return;
+        default:
+          ref.read(uploadListState.notifier).setListItem(
+              uuid, itemToUpload.setUploadState(UploadState.error));
+          return;
       }
     });
+  }
+
+  void _removeAll(WidgetRef ref) async {
+    List<ListItem> itemsToUpload = ref.read(uploadListState.notifier).getAll();
+
+    for (final item in itemsToUpload) {
+      String id = await _addToFirestore(item.song);
+      UploadTask task = await _uploadFileToStorage('$id.mp3', item.bytes);
+      task.snapshotEvents.listen((taskSnapshot) {
+        bool running = false;
+        switch (taskSnapshot.state) {
+          case TaskState.running:
+            if (!running) {
+              ref.read(uploadListState.notifier).setListItem(
+                  item.id, item.setUploadState(UploadState.running));
+              running = true;
+            }
+            break;
+          case TaskState.success:
+            ref.read(uploadListState.notifier).setListItem(
+                item.id, item.setUploadState(UploadState.successful));
+            ref.read(uploadListState.notifier).removeItem(item.id);
+            return;
+          default:
+            ref
+                .read(uploadListState.notifier)
+                .setListItem(item.id, item.setUploadState(UploadState.error));
+            return;
+        }
+      });
+    }
   }
 
   Future<String> _addToFirestore(SongDTO dto) async {
@@ -178,6 +189,4 @@ class _UploadListState extends State<UploadList> {
     return await getIt<FirebaseStorageService>()
         .uploadFileViaBytes(name, bytes);
   }
-
-  void _removeAll() async {}
 }

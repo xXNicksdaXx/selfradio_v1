@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:selfradio/provider/upload_list_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'constants.dart';
 import 'firebase_options.dart';
@@ -14,7 +13,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await setupGetIt();
-  runApp(const SelfradioApp());
+  runApp(ProviderScope(child: SelfradioApp()));
 }
 
 class SelfradioApp extends StatelessWidget {
@@ -23,21 +22,16 @@ class SelfradioApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UploadListProvider()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Selfradio',
-        theme: ThemeData(
-          scaffoldBackgroundColor: kBackgroundColor,
-          primaryColor: kPrimaryColor,
-          textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const HomeScreen(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Selfradio',
+      theme: ThemeData(
+        scaffoldBackgroundColor: kBackgroundColor,
+        primaryColor: kPrimaryColor,
+        textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: const HomeScreen(),
     );
   }
 }

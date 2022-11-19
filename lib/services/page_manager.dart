@@ -11,6 +11,7 @@ class PageManager {
 
   // Listeners: Updates going to the UI
   final currentSongTitleNotifier = ValueNotifier<String>('');
+  final currentSongArtistNotifier = ValueNotifier<String>('');
   final playlistNotifier = ValueNotifier<List<String>>([]);
   final progressNotifier = ProgressNotifier();
   final repeatButtonNotifier = RepeatButtonNotifier();
@@ -85,7 +86,7 @@ class PageManager {
   }
 
   Future<void> _loadPlaylist() async {
-    const mediaItems = [
+    const songs = [
       MediaItem(
         id: 'Bea Miller - Playground',
         album: 'Playlist 3.11',
@@ -107,7 +108,7 @@ class PageManager {
         },
       )
     ];
-    audioHandler.addQueueItems(mediaItems);
+    audioHandler.addQueueItems(songs);
   }
 
   void _listenToChangesInPlaylist() {
@@ -172,6 +173,7 @@ class PageManager {
   void _listenToChangesInSong() {
     audioHandler.mediaItem.listen((mediaItem) {
       currentSongTitleNotifier.value = mediaItem?.title ?? '';
+      currentSongArtistNotifier.value = mediaItem?.artist ?? '';
       _updateSkipButtons();
     });
   }

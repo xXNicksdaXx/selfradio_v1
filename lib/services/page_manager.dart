@@ -11,6 +11,7 @@ class PageManager {
 
   // Listeners: Updates going to the UI
   final currentSongTitleNotifier = ValueNotifier<String>('');
+  final currentSongArtistNotifier = ValueNotifier<String>('');
   final playlistNotifier = ValueNotifier<List<String>>([]);
   final progressNotifier = ProgressNotifier();
   final repeatButtonNotifier = RepeatButtonNotifier();
@@ -172,6 +173,7 @@ class PageManager {
   void _listenToChangesInSong() {
     audioHandler.mediaItem.listen((mediaItem) {
       currentSongTitleNotifier.value = mediaItem?.title ?? '';
+      currentSongArtistNotifier.value = mediaItem?.artist ?? '';
       _updateSkipButtons();
     });
   }

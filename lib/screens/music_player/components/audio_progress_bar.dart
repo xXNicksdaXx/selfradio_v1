@@ -1,5 +1,6 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:selfradio/constants.dart';
 
 import '../../../notifiers/progress_notifier.dart';
 import '../../../services/locator.dart';
@@ -19,6 +20,10 @@ class AudioProgressBar extends StatelessWidget {
           buffered: value.buffered,
           total: value.total,
           onSeek: pageManager.seek,
+          thumbColor: kPrimaryColor,
+          baseBarColor: kPrimaryColor.withOpacity(0.5),
+          bufferedBarColor: const Color(0x00000000),
+          progressBarColor: kPrimaryColor.withOpacity(0.8),
         );
       },
     );

@@ -7,15 +7,15 @@ import 'dto/song_dto.dart';
 class ListItem {
   Map<String, dynamic> id3Tags;
   Uint8List bytes;
-  late bool isExpanded;
   late SongDTO song;
+  int index;
 
   ListItem({
     required this.id3Tags,
     required originalTitle,
     required this.bytes,
+    required this.index,
   }) {
-    isExpanded = false;
     String artist, title, album;
     if (id3Tags['Artist'] != null) {
       artist = id3Tags['Artist'];
@@ -35,5 +35,3 @@ class ListItem {
     song = SongDTO(artists: [artist], title: title, album: album);
   }
 }
-
-

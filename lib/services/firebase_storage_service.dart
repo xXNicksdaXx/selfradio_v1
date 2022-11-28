@@ -7,18 +7,12 @@ import 'package:flutter/foundation.dart';
 class FirebaseStorageService {
   final FirebaseStorage storage = FirebaseStorage.instance;
 
-  void uploadFileViaBytes(String name, Uint8List data) async {
-    try {
-      await storage.ref().child('songs/$name').putData(
-          data,
-          SettableMetadata(
-            contentType: 'audio/mpeg',
-          ));
-    } on FirebaseException catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
+  Future<UploadTask> uploadFileViaBytes(String name, Uint8List data) async {
+    return storage.ref().child('songs/$name').putData(
+        data,
+        SettableMetadata(
+          contentType: 'audio/mpeg',
+        ));
   }
 
   void uploadFileViaFile(String name, File file) async {

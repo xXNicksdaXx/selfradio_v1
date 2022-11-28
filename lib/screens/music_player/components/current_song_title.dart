@@ -26,9 +26,7 @@ class CurrentSongTitle extends StatelessWidget {
           builder: (_, artist, __) {
             return Padding(
               padding: const EdgeInsets.only(
-                top: kDefaultPadding * 0.5,
-                bottom: kDefaultPadding,
-              ),
+                  top: kDefaultPadding * 0.5, bottom: kDefaultPadding),
               child: Text(artist, style: const TextStyle(fontSize: 16)),
             );
           },

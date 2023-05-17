@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../constants.dart';
 import '../../entities/dto/song_dto.dart';
@@ -17,64 +15,25 @@ class EditScreen extends StatefulWidget {
 }
 
 class _EditScreenState extends State<EditScreen> {
-  final formKey = GlobalKey<FormBuilderState>();
-  List<Widget> artistFieldList = <Widget>[];
-  List<Widget> featFieldList = <Widget>[];
+  final _formKey = GlobalKey<FormState>();
 
-  int artists = 0;
-  int feat = 0;
+  String title = "";
+  String album = "";
+  List<String> artistFieldList = <String>[];
+  List<String> featFieldList = <String>[];
 
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < widget.song.artists.length; i++) {
-      _createArtistForm(i);
+    title = widget.song.title;
+    album = widget.song.album;
+    artistFieldList.addAll(widget.song.artists);
+    if (artistFieldList.isEmpty) {
+      artistFieldList.add("");
     }
     if (widget.song.feat != null) {
-      for (int i = 0; i < widget.song.feat!.length; i++) {
-        _createFeatForm(i);
-      }
+      featFieldList.addAll(widget.song.feat!);
     }
-  }
-
-  void _createArtistForm(int i) {
-    artists++;
-    final String initialValue;
-    i >= 0 ? initialValue = widget.song.artists[i] : initialValue = '';
-    final form = FormBuilderTextField(
-      name: 'artist$artists',
-      autovalidateMode: AutovalidateMode.always,
-      controller: TextEditingController(text: initialValue),
-      decoration: InputDecoration(
-        labelText: 'Interpret #$artists',
-        labelStyle: const TextStyle(color: kSecondaryColor),
-      ),
-      validator: FormBuilderValidators.required(
-          errorText: 'Das Interpret-Feld darf nicht leer sein!'),
-    );
-    setState(() {
-      artistFieldList.add(form);
-    });
-  }
-
-  void _createFeatForm(int i) {
-    feat++;
-    final String initialValue;
-    i >= 0 ? initialValue = widget.song.feat![i] : initialValue = '';
-    final form = FormBuilderTextField(
-      name: 'feat$feat',
-      autovalidateMode: AutovalidateMode.always,
-      controller: TextEditingController(text: initialValue),
-      decoration: InputDecoration(
-        labelText: 'Featuring #$feat',
-        labelStyle: const TextStyle(color: kSecondaryColor),
-      ),
-      validator: FormBuilderValidators.required(
-          errorText: 'Das Feat-Feld darf nicht leer sein!'),
-    );
-    setState(() {
-      featFieldList.add(form);
-    });
   }
 
   @override
@@ -93,72 +52,130 @@ class _EditScreenState extends State<EditScreen> {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
-        child: FormBuilder(
-          key: formKey,
-          autovalidateMode: AutovalidateMode.disabled,
+        child: Form(
+          key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: artists,
-                  itemBuilder: (context, index) {
-                    return artistFieldList[index];
-                  }),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: artistFieldList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return TextFormField(
+                        initialValue: artistFieldList[index],
+                        decoration: InputDecoration(
+                          labelText: 'Interpret #${index + 1}',
+                          labelStyle: const TextStyle(color: kSecondaryColor),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Das Interpret-Feld darf nicht leer sein';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          setState(() {
+                            artistFieldList[index] = value!;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
               buildAddAndRemoveIcon(FieldClass.artistField),
               buildDivider(),
-              FormBuilderTextField(
-                name: 'title',
+              TextFormField(
+                initialValue: title,
                 autovalidateMode: AutovalidateMode.always,
-                controller: TextEditingController(text: widget.song.title),
                 decoration: const InputDecoration(
                   labelText: 'Titel',
                   labelStyle: TextStyle(color: kSecondaryColor),
                 ),
-                validator: FormBuilderValidators.required(
-                    errorText: 'Das Titel-Feld darf nicht leer sein!'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Das Titel-Feld darf nicht leer sein';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  setState(() {
+                    title = value!;
+                  });
+                },
               ),
               buildDivider(),
-              FormBuilderTextField(
-                name: 'album',
-                autovalidateMode: AutovalidateMode.always,
-                controller: TextEditingController(text: widget.song.album),
+              TextFormField(
+                initialValue: album,
                 decoration: const InputDecoration(
                   labelText: 'Album',
                   labelStyle: TextStyle(color: kSecondaryColor),
                 ),
+                onSaved: (value) {
+                  setState(() {
+                    album = value!;
+                  });
+                },
               ),
               buildDivider(),
-              ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: feat,
-                  itemBuilder: (context, index) {
-                    return featFieldList[index];
-                  }),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: featFieldList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return TextFormField(
+                        initialValue: featFieldList[index],
+                        decoration: InputDecoration(
+                          labelText: 'Feat #${index + 1}',
+                          labelStyle: const TextStyle(color: kSecondaryColor),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Das Featuring-Feld darf nicht leer sein';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          setState(() {
+                            featFieldList[index] = value!;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
               buildAddAndRemoveIcon(FieldClass.featField),
             ],
           ),
-          onChanged: () {
-            formKey.currentState!.save();
-          },
         ),
       ),
     );
   }
 
   Widget buildAddAndRemoveIcon(FieldClass fieldClass) {
-    List<Widget> icons = [];
+    List<Widget> widgets = [];
     if (fieldClass == FieldClass.artistField) {
-      icons.add(const Text('Interpreten bearbeiten:'));
-      icons.add(IconButton(
+      widgets.add(const Text('Interpreten bearbeiten:'));
+      widgets.add(IconButton(
           icon: const Icon(
             Icons.add_circle_outline,
             color: kPrimaryColor,
           ),
           onPressed: () {
-            _createArtistForm(-1);
+            setState(() {
+              artistFieldList.add("");
+            });
           }));
-      if (artists > 1) {
-        icons.add(
+      if (artistFieldList.length > 1) {
+        widgets.add(
           IconButton(
             icon: const Icon(
               Icons.remove_circle_outline,
@@ -167,24 +184,25 @@ class _EditScreenState extends State<EditScreen> {
             onPressed: () {
               setState(() {
                 artistFieldList.removeLast();
-                artists--;
               });
             },
           ),
         );
       }
     } else {
-      icons.add(const Text('Featuring bearbeiten:'));
-      icons.add(IconButton(
+      widgets.add(const Text('Featuring bearbeiten:'));
+      widgets.add(IconButton(
           icon: const Icon(
             Icons.add_circle_outline,
             color: kPrimaryColor,
           ),
           onPressed: () {
-            _createFeatForm(-1);
+            setState(() {
+              featFieldList.add("");
+            });
           }));
-      if (feat > 1) {
-        icons.add(
+      if (featFieldList.isNotEmpty) {
+        widgets.add(
           IconButton(
             icon: const Icon(
               Icons.remove_circle_outline,
@@ -193,7 +211,6 @@ class _EditScreenState extends State<EditScreen> {
             onPressed: () {
               setState(() {
                 featFieldList.removeLast();
-                feat--;
               });
             },
           ),
@@ -202,7 +219,7 @@ class _EditScreenState extends State<EditScreen> {
     }
 
     return Row(
-      children: icons,
+      children: widgets,
     );
   }
 
@@ -220,42 +237,26 @@ class _EditScreenState extends State<EditScreen> {
               color: kTextColor,
             ),
             onPressed: () {
-              formKey.currentState?.reset();
               Navigator.of(context).pop();
             },
           ),
           IconButton(
-            icon: const Icon(
-              Icons.done,
-              color: kTextColor,
-            ),
-            onPressed: () {
-              if (formKey.currentState?.saveAndValidate() ?? false) {
-                Map<String, dynamic>? values = formKey.currentState?.value;
-
-                final title = values!['title'];
-                final album = values['album'];
-
-                List<String> artistList = [];
-                for (int i = 1; i <= artists; i++) {
-                  artistList.add(values['artist$i']);
+              icon: const Icon(
+                Icons.done,
+                color: kTextColor,
+              ),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  final item = SongDTO(
+                    artists: artistFieldList,
+                    title: title,
+                    album: album,
+                    feat: featFieldList,
+                  );
+                  Navigator.of(context).pop(item);
                 }
-
-                List<String>? featList = [];
-                for (int i = 1; i <= feat; i++) {
-                  featList.add(values['feat$i']);
-                }
-
-                final item = SongDTO(
-                  artists: artistList,
-                  title: title,
-                  album: album,
-                  feat: featList,
-                );
-                Navigator.of(context).pop(item);
-              }
-            },
-          ),
+              }),
         ],
       ),
     );

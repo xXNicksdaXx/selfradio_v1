@@ -11,6 +11,7 @@ class PageManager {
 
   // Listeners: Updates going to the UI
   final currentSongTitleNotifier = ValueNotifier<String>('');
+  final currentSongArtistNotifier = ValueNotifier<String>('');
   final playlistNotifier = ValueNotifier<List<String>>([]);
   final progressNotifier = ProgressNotifier();
   final repeatButtonNotifier = RepeatButtonNotifier();
@@ -87,25 +88,36 @@ class PageManager {
   Future<void> _loadPlaylist() async {
     const mediaItems = [
       MediaItem(
-        id: 'Bea Miller - Playground',
-        album: 'Playlist 3.11',
-        title: 'Playground',
-        artist: 'Bea Miller',
+        id: 'Kate Bush - Running Up That Hill',
+        album: '',
+        title: 'Running Up That Hill',
+        artist: 'Kate Bush',
         extras: {
           'url':
-              'https://firebasestorage.googleapis.com/v0/b/selfradio-f2820.appspot.com/o/songs%2F7PtLIIJ8PAWnCqKJB6ip.mp3?alt=media&token=aef38918-5000-499d-bec0-64dd38499d0b'
+              'https://firebasestorage.googleapis.com/v0/b/selfradio-f2820.appspot.com/o/songs%2F4JRI4w1CRuZ5FgdwgEO1.mp3?alt=media&token=172e03b5-d52d-4117-93d6-6e352c236774'
         },
       ),
       MediaItem(
-        id: 'Cartoon - On & On',
-        album: 'Playlist 3.11',
-        title: 'On & On',
-        artist: 'Cartoon',
+        id: 'ABBA - Lay All Your Love On Me',
+        album: '',
+        title: 'Lay All Your Love On Me',
+        artist: 'ABBA',
         extras: {
           'url':
-              'https://firebasestorage.googleapis.com/v0/b/selfradio-f2820.appspot.com/o/songs%2F7gL4mbPFilNp7gsIWHeh.mp3?alt=media&token=6e504376-2012-4c6e-a8e8-b7d3c16079bf'
+              'https://firebasestorage.googleapis.com/v0/b/selfradio-f2820.appspot.com/o/songs%2FD8031K56VMtmuQ5c0h2R.mp3?alt=media&token=d4449d75-f4ce-42a0-a0cf-135bd2c4a7f0'
+        },
+      ),
+      MediaItem(
+        id: 'Belinda Carlisle - Circle In The Sand',
+        album: '',
+        title: 'Circle In The Sand',
+        artist: 'Belinda Carlisle',
+        extras: {
+          'url':
+          'https://firebasestorage.googleapis.com/v0/b/selfradio-f2820.appspot.com/o/songs%2FNTwdZ32gH7Xqfe51GApX.mp3?alt=media&token=78175e38-c5a9-4060-9ec4-d6fd10290e13'
         },
       )
+
     ];
     audioHandler.addQueueItems(mediaItems);
   }
@@ -172,6 +184,7 @@ class PageManager {
   void _listenToChangesInSong() {
     audioHandler.mediaItem.listen((mediaItem) {
       currentSongTitleNotifier.value = mediaItem?.title ?? '';
+      currentSongArtistNotifier.value = mediaItem?.artist ?? '';
       _updateSkipButtons();
     });
   }

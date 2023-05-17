@@ -86,7 +86,7 @@ class PageManager {
   }
 
   Future<void> _loadPlaylist() async {
-    const mediaItems = [
+    const songs = [
       MediaItem(
         id: 'Kate Bush - Running Up That Hill',
         album: '',
@@ -119,7 +119,7 @@ class PageManager {
       )
 
     ];
-    audioHandler.addQueueItems(mediaItems);
+    audioHandler.addQueueItems(songs);
   }
 
   void _listenToChangesInPlaylist() {

@@ -13,7 +13,7 @@ class AddSongScreen extends StatelessWidget {
         title: const Text('Lieder einfügen'),
         backgroundColor: kPrimaryColor,
       ),
-      body: const UploadList(),
+      body: UploadList(),
     );
   }
 }
